@@ -44,7 +44,7 @@ new_data = bc_data %>%
 ### Question 3
 Create a bar chart showing the % of breast cancer cases and controls within each BMI category.
 
-#### % of Breast Cancer 
+#### Proportion of Breast Cancer 
 ```{r}
 new_data2 =
 new_data %>% 
@@ -54,12 +54,14 @@ new_data %>%
     bc = sum(Classification == 2)/ n()
   ) %>% 
   ggplot(aes(x = BMI, y = bc, fill = BMI)) +
-  geom_bar(stat = "identity")
+  geom_bar(stat = "identity") +
+  ggtitle("% of breast cancer cases in each BMI category") +
+  xlab("BMI category") + ylab("% of cases")
 
 new_data2
 ```
 
-#### % of Control
+#### Proportion of Control
 ```{r}
 new_data3 =
 new_data %>% 
@@ -69,19 +71,45 @@ new_data %>%
     bc = sum(Classification == 2)/ n()
   ) %>% 
   ggplot(aes(x = BMI, y = control, fill = BMI)) +
-  geom_bar(stat = "identity")
+  geom_bar(stat = "identity") + 
+  ggtitle("% of controls in each BMI category") +
+  xlab("BMI category") + ylab("% of controls")
 
 new_data3
 ```
 
 ### Question 4
-```{r}
+Construct a **logistic** regression model:  
+* outcome: breast cancer classification  
+* independent variables: glucose, HOMA-IR, leptin, BMI (continuous), age  
 
+Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in HOMA-IR.
+```{r, message=FALSE}
+model_data = bc_data %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    classification = ifelse(classification == 1, 0, 1)
+  )
+
+logistic_model = glm(classification ~ glucose + homa + leptin + bmi + age, data = model_data, family = "binomial")
+
+summary(logistic_model)
+confint(logistic_model) #CI for coefficients
 ```
+For every one unit change in HOMA-IR, the log odds of having breast cancer increases by **`r logistic_model[["coefficients"]][["homa"]]`** (95% CI: -0.025, 0.653).  
 
+<https://stats.oarc.ucla.edu/r/dae/logit-regression/>
 
 ### Question 5
-```{r}
+Construct a **linear** regression model:  
+* outcome: insulin  
+* independent variables: BMI (continuous), age, glucose  
 
+Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in age.
+```{r, message=FALSE}
+linear_model = lm(insulin ~ bmi + age + glucose, data = model_data)
+summary(linear_model)
+confint(linear_model)
 ```
+For every one year increase in age, the insulin decreases by **`r linear_model[["coefficients"]][["age"]]`** microU/mL (95% CI: -0.157, 0.048).
 
