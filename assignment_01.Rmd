@@ -1,0 +1,87 @@
+---
+title: "assignment_1"
+author: "Fang Liu"
+date: "1/23/2022"
+output: html_document
+---
+
+First, load in the required libraries. 
+```{r, messages = FALSE}
+library(tidyverse)
+bc_data = read.csv("bcdata.csv")
+```
+
+
+### Question #1  
+Construct a table providing summaries of the quantitative features of the dataset.Summaries should include the mean, median, minimum value, and maximum value.
+```{r}
+summary_data = summary(bc_data)
+summary_data
+
+```
+
+
+### Question 2  
+Recode BMI into the WHO-defined categories
+```{r}
+new_data = bc_data %>%
+  mutate(
+    BMI = case_when(
+    BMI < 16.5 ~ "Severely underweight",
+    BMI > 16.5 & BMI < 18.5 ~ "Underweight",
+    BMI >= 18.5 & BMI <= 24.9 ~ "Normal weight",      
+    BMI >= 25 & BMI <= 29.9 ~ "Overweight",
+    BMI >= 30 & BMI <= 34.9 ~ "Obsesity class I",
+    BMI >= 35 & BMI <=39.9 ~ "Obesity class II",
+    TRUE ~ "Obesity class III")
+    ) %>% 
+  mutate(
+    BMI = factor(BMI, levels = c("Severely underweight", "Underweight", "Normal weight", "Overweight", "Obsesity class I", "Obesity class II", "Obesity class III"))
+  )
+```
+
+
+### Question 3
+Create a bar chart showing the % of breast cancer cases and controls within each BMI category.
+
+#### % of Breast Cancer 
+```{r}
+new_data2 =
+new_data %>% 
+  group_by(BMI) %>% 
+  summarize(
+    control = sum(Classification == 1) / n(),
+    bc = sum(Classification == 2)/ n()
+  ) %>% 
+  ggplot(aes(x = BMI, y = bc, fill = BMI)) +
+  geom_bar(stat = "identity")
+
+new_data2
+```
+
+#### % of Control
+```{r}
+new_data3 =
+new_data %>% 
+  group_by(BMI) %>% 
+  summarize(
+    control = sum(Classification == 1) / n(),
+    bc = sum(Classification == 2)/ n()
+  ) %>% 
+  ggplot(aes(x = BMI, y = control, fill = BMI)) +
+  geom_bar(stat = "identity")
+
+new_data3
+```
+
+### Question 4
+```{r}
+
+```
+
+
+### Question 5
+```{r}
+
+```
+
